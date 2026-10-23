@@ -1,0 +1,47 @@
+services:
+  php-vuln:
+    build:
+      context: ./app
+      args:
+        PHP_TAG: ${PHP_VULN_TAG}
+    image: php-lab:vuln
+    container_name: php-lab-vuln
+    ports:
+      - "8080:80"
+    networks:
+      - labnet
+    cap_drop: [ALL]
+    cap_add: [NET_RAW, NET_ADMIN]   # untuk tcpdump di dalam container
+    security_opt: ["no-new-privileges:true"]
+    read_only: false
+    tmpfs:
+      - /tmp
+    volumes:
+      - vuln-logs:/var/log/php
+
+  php-fixed:
+    build:
+      context: ./app
+      args:
+        PHP_TAG: ${PHP_FIXED_TAG}
+    image: php-lab:fixed
+    container_name: php-lab-fixed
+    ports:
+      - "8081:80"
+    networks:
+      - labnet
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    read_only: false
+    tmpfs:
+      - /tmp
+    volumes:
+      - fixed-logs:/var/log/php
+
+networks:
+  labnet:
+    driver: bridge
+
+volumes:
+  vuln-logs:
+  fixed-logs:
